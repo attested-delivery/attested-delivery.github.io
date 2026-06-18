@@ -1,0 +1,15 @@
+# Keep the SHA pins in the workflows fresh. Dependabot's github-actions
+# ecosystem opens PRs that bump pinned SHAs (and their version comments) as new
+# releases ship — including the central reusable-workflow pins referenced by SHA.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: ci

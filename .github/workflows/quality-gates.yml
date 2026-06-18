@@ -1,0 +1,44 @@
+name: quality-gates
+
+# Merge-time quality gates, wired as a thin caller of the org's central reusable
+# workflows in attested-delivery/.github (pinned by full commit SHA). Findings
+# converge on the code-scanning Security tab; pin-check fails closed on any
+# unpinned `uses:`.
+#
+# Scope note: Trivy (container/IaC/license) and Scorecard are intentionally NOT
+# wired here — their actions (aquasecurity/trivy-action, ossf/scorecard-action)
+# are not yet on the org Actions allow-list, so calling them would startup-fail.
+# Add them to the allow-list first, then enable those jobs.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  sast:
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+    uses: attested-delivery/.github/.github/workflows/reusable-sast-codeql.yml@0e8ba553a55146eddf66e027f157b3cbb294466a
+    with:
+      languages: javascript-typescript
+
+  sca:
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+      pull-requests: write
+    uses: attested-delivery/.github/.github/workflows/reusable-sca-osv.yml@0e8ba553a55146eddf66e027f157b3cbb294466a
+    with:
+      fail-on-severity: high
+
+  pin-check:
+    permissions:
+      contents: read
+    uses: attested-delivery/.github/.github/workflows/pin-check.yml@0e8ba553a55146eddf66e027f157b3cbb294466a
