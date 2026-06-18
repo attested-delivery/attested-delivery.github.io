@@ -1,14 +1,21 @@
 name: quality-gates
 
 # Merge-time quality gates, wired as a thin caller of the org's central reusable
-# workflows in attested-delivery/.github (pinned by full commit SHA). Findings
-# converge on the code-scanning Security tab; pin-check fails closed on any
-# unpinned `uses:`.
+# workflows in attested-delivery/.github (pinned by full commit SHA).
 #
-# Scope note: Trivy (container/IaC/license) and Scorecard are intentionally NOT
-# wired here — their actions (aquasecurity/trivy-action, ossf/scorecard-action)
-# are not yet on the org Actions allow-list, so calling them would startup-fail.
-# Add them to the allow-list first, then enable those jobs.
+# Active: pin-check — fails closed on any unpinned `uses:` on push and PR.
+#
+# Pending one org-side allow-list change (owner action):
+#   SAST  (reusable-sast-codeql) and SCA (reusable-sca-osv) both run
+#   `github/codeql-action/*`. Calling them currently startup-fails ("workflow
+#   file issue"), because `github/codeql-action` is not yet permitted by the org
+#   Actions allow-list. Enable it via Org → Settings → Actions → General →
+#   "Allow actions created by GitHub" (or add `github/codeql-action@*`), and also
+#   confirm the OSV subpath `google/osv-scanner-action/*` is covered. Then
+#   uncomment the sast/sca jobs below.
+#
+# Trivy (container/IaC/license) and Scorecard remain out until their actions
+# (aquasecurity/trivy-action, ossf/scorecard-action) are allow-listed too.
 
 on:
   push:
@@ -19,19 +26,20 @@ permissions:
   contents: read
 
 jobs:
-  sast:
+  pin-check:
     permissions:
-      security-events: write
       contents: read
-      actions: read
-    uses: attested-delivery/.github/.github/workflows/reusable-sast-codeql.yml@0e8ba553a55146eddf66e027f157b3cbb294466a
-    with:
-      languages: javascript-typescript
+    uses: attested-delivery/.github/.github/workflows/pin-check.yml@0e8ba553a55146eddf66e027f157b3cbb294466a
 
-  # SCA (OSV-Scanner) temporarily isolated: the reusable references the subpath
-  # action google/osv-scanner-action/osv-scanner-action, which the org allow-list
-  # entry `google/osv-scanner-action@*` may not cover (subpath actions can need
-  # an explicit `google/osv-scanner-action/*`). Re-enable once confirmed/added.
+  # sast:
+  #   permissions:
+  #     security-events: write
+  #     contents: read
+  #     actions: read
+  #   uses: attested-delivery/.github/.github/workflows/reusable-sast-codeql.yml@0e8ba553a55146eddf66e027f157b3cbb294466a
+  #   with:
+  #     languages: javascript-typescript
+  #
   # sca:
   #   permissions:
   #     actions: read
@@ -41,8 +49,3 @@ jobs:
   #   uses: attested-delivery/.github/.github/workflows/reusable-sca-osv.yml@0e8ba553a55146eddf66e027f157b3cbb294466a
   #   with:
   #     fail-on-severity: high
-
-  pin-check:
-    permissions:
-      contents: read
-    uses: attested-delivery/.github/.github/workflows/pin-check.yml@0e8ba553a55146eddf66e027f157b3cbb294466a
