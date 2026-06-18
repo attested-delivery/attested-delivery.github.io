@@ -1,0 +1,54 @@
+---
+// Theme select — Auto / Dark / Light, matching the /docs (Starlight) control.
+// Persists to localStorage('starlight-theme') (auto removes the key) and sets
+// document.documentElement.dataset.theme. Base.astro applies the stored choice
+// before paint; this control changes it and reacts to system changes when Auto.
+---
+
+<label class="theme-toggle">
+  <span class="sr-only">Theme</span>
+  <svg class="theme-toggle__icon" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true">
+    <path fill="currentColor" d="M8 0a8 8 0 100 16A8 8 0 008 0zM2 8a6 6 0 016-6v12A6 6 0 012 8z"
+    ></path>
+  </svg>
+  <select aria-label="Select color theme" data-theme-select>
+    <option value="auto">Auto</option>
+    <option value="dark">Dark</option>
+    <option value="light">Light</option>
+  </select>
+</label>
+
+<script is:inline>
+  (() => {
+    const KEY = 'starlight-theme';
+    const select = document.querySelector('[data-theme-select]');
+    if (!select) return;
+    const mq = matchMedia('(prefers-color-scheme: light)');
+
+    let stored = null;
+    try {
+      stored = localStorage.getItem(KEY);
+    } catch {
+      /* localStorage unavailable */
+    }
+    select.value = stored === 'light' || stored === 'dark' ? stored : 'auto';
+
+    const resolve = (pref) =>
+      pref === 'light' || pref === 'dark' ? pref : mq.matches ? 'light' : 'dark';
+
+    const apply = (pref) => {
+      document.documentElement.dataset.theme = resolve(pref);
+      try {
+        if (pref === 'light' || pref === 'dark') localStorage.setItem(KEY, pref);
+        else localStorage.removeItem(KEY);
+      } catch {
+        /* ignore persistence failure */
+      }
+    };
+
+    select.addEventListener('change', () => apply(select.value));
+    mq.addEventListener('change', () => {
+      if (select.value === 'auto') apply('auto');
+    });
+  })();
+</script>

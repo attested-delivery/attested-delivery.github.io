@@ -1,0 +1,66 @@
+---
+// (b) How it works — the GitHub-native backend in user-facing terms.
+const steps = [
+  {
+    n: '1',
+    title: 'Pin every action by commit SHA',
+    body: 'A tag can be force-pushed; a commit SHA cannot. Every third-party action is pinned to its immutable commit, and a required pin-check job fails the build if anything slips back to a tag.',
+    code: 'uses: actions/checkout@<full-40-char-sha>',
+  },
+  {
+    n: '2',
+    title: 'Build once, get provenance',
+    body: 'One build in CI produces one content digest. GitHub Actions OIDC mints a short-lived identity — no long-lived signing keys — and emits SLSA provenance bound to that exact digest.',
+    code: 'predicateType: https://slsa.dev/provenance/v1',
+  },
+  {
+    n: '3',
+    title: 'Attest what it contains',
+    body: 'A CycloneDX SBOM and test-result attestations are signed keyless with Sigstore/cosign and recorded in the Rekor transparency log. Every claim is a statement about the digest.',
+    code: 'cosign attest --type cyclonedx --yes $IMAGE',
+  },
+  {
+    n: '4',
+    title: 'Promote the digest, never rebuild',
+    body: 'Promotion copies the same digest forward — dev to staging to prod — and re-verifies it. Because the bytes never change, the provenance and SBOM keep applying to what actually runs.',
+    code: 'cosign copy $IMAGE@sha256:… $PROD@sha256:…',
+  },
+  {
+    n: '5',
+    title: 'Fail closed at admission',
+    body: 'At the deploy boundary, an unverifiable artifact does not deploy. Verification is enforced at admission, not by convention — a missing or mismatched attestation is a hard stop.',
+    code: 'gh attestation verify $ART --repo $OWNER/$REPO',
+  },
+  {
+    n: '6',
+    title: 'Anyone can re-check it',
+    body: 'The whole chain is public and content-addressed. A reviewer, an auditor, or a downstream consumer re-verifies the release independently from a clean workstation — no trust required.',
+    code: 'gh attestation verify ./artifact --repo $OWNER/$REPO',
+  },
+];
+---
+
+<section class="section" id="how">
+  <div class="container">
+    <span class="eyebrow">How it works</span>
+    <h2>Six guarantees, all on GitHub-native tooling</h2>
+    <p class="lede">
+      No new control plane to run. The backend is GitHub Actions with OIDC, Sigstore/cosign, the
+      Rekor transparency log, and SLSA provenance — wired so that immutable identity is the only
+      thing in the trust path.
+    </p>
+
+    <div class="steps">
+      {
+        steps.map((s) => (
+          <article class="step">
+            <span class="step__num">{s.n}</span>
+            <h3>{s.title}</h3>
+            <p>{s.body}</p>
+            <code>{s.code}</code>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>

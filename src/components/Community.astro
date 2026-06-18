@@ -1,0 +1,79 @@
+---
+// (c) Community / engagement — contribute, discuss, adopt.
+import Giscus from './Giscus.astro';
+
+const org = 'https://github.com/attested-delivery';
+const orgDiscussions = 'https://github.com/orgs/attested-delivery/discussions';
+const cards = [
+  {
+    title: 'Read the reference docs',
+    body: 'Concepts, ADRs, and full pipeline specifications — the why behind every gate, with sources you can follow.',
+    href: '/docs/',
+    cta: 'Open the docs',
+  },
+  {
+    title: 'Start from a template',
+    body: 'Language-agnostic and Rust attested templates, both publishing independently-verifiable v0.1.0 releases today.',
+    href: `${org}/attested-pipeline-template`,
+    cta: 'Browse templates',
+  },
+  {
+    title: 'Join org discussions',
+    body: 'Ask how a gate works, propose a hazard worth defending against, or share how you adopted attested delivery in your org — all in one org-wide space.',
+    href: orgDiscussions,
+    cta: 'Open discussions',
+  },
+  {
+    title: 'Contribute',
+    body: 'Issues, reusable workflows, and the docs are open. Good first issues are labeled; every change ships through the same attested pipeline it describes.',
+    href: `${org}/.github/blob/main/CONTRIBUTING.md`,
+    cta: 'Read CONTRIBUTING',
+  },
+];
+---
+
+<section class="section" id="community">
+  <div class="container">
+    <span class="eyebrow">Community</span>
+    <h2>Raise your posture with people doing the same</h2>
+    <p class="lede">
+      attested-delivery is a public reference org, not a product pitch. The workflows, templates,
+      and docs are open so your team can adopt them, audit them, and improve them.
+    </p>
+
+    <div class="community__cards">
+      {
+        cards.map((c) => (
+          <a class="card-link" href={c.href}>
+            <h3>{c.title}</h3>
+            <p>{c.body}</p>
+            <span class="arrow">{c.cta} &rarr;</span>
+          </a>
+        ))
+      }
+    </div>
+
+    <div class="cta-banner">
+      <h3>Adopt attested delivery in your org</h3>
+      <p class="lede">
+        Fork the templates, turn on SHA-pinning, and require attestation verification at admission.
+        Your next release becomes one anyone can prove — including you, six months from now.
+      </p>
+      <a class="btn btn-primary" href="#quickstart">Start the quickstart &rarr;</a>
+    </div>
+
+    <div class="discuss" id="discuss">
+      <div class="discuss__head">
+        <div>
+          <h3>Talk it through in the open</h3>
+          <p class="muted">
+            Questions, proposals, and adoption stories live in the org-wide discussion space — one
+            place across every attested-delivery repo. Comment below or open a thread.
+          </p>
+        </div>
+        <a class="btn btn-ghost" href={orgDiscussions}>All org discussions &rarr;</a>
+      </div>
+      <Giscus />
+    </div>
+  </div>
+</section>

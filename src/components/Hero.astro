@@ -1,0 +1,56 @@
+---
+// (a) Hero — names the threat climate and the security/delivery-posture value prop.
+const threats = [
+  {
+    title: 'CVE-2026-33634',
+    body: 'The Trivy scanner was turned into a credential thief: 76 of 77 trivy-action tags force-pushed to malicious commits. The thing scanning your images was the compromise.',
+  },
+  {
+    title: 'Mutable tags',
+    body: 'A git tag is a pointer, not an identity. A force-push silently re-points it at new bytes. Nothing in your workflow changes; the next run just pulls different code.',
+  },
+  {
+    title: 'Orphaned attestations',
+    body: 'You sign a provenance in CI, then promotion rebuilds the image. Production runs a different digest. Your signature is genuine — and describes bytes that never shipped.',
+  },
+];
+---
+
+<header class="hero" id="top">
+  <div class="hero__grid" aria-hidden="true"></div>
+  <div class="container hero__content">
+    <span class="eyebrow">Supply-chain security · GitHub-native</span>
+    <h1>
+      The digest <span class="accent">is</span> the release.
+    </h1>
+    <p class="hero__sub">
+      In 2026 the supply chain stopped being abstract. Scanners shipped malware, tags moved under
+      running pipelines, and signed attestations described artifacts that never reached production.
+      <strong>attested-delivery</strong> makes one promise legible: the thing you verified is the thing
+      that runs — signed, SLSA-attested, and refused at the door if it can't be proven.
+    </p>
+    <div class="hero__actions">
+      <a class="btn btn-primary" href="#quickstart">Get started &rarr;</a>
+      <a class="btn btn-ghost" href="#how">See how it works</a>
+    </div>
+
+    <div class="hero__proof" role="note" aria-label="Example verification">
+      <span class="muted"># anyone can re-check a release from a clean workstation</span>
+      <span>$ gh attestation verify ./app --repo attested-delivery/rust-template</span>
+      <span class="ok"
+        >&check; verified SLSA provenance · CycloneDX SBOM · digest sha256:2d0586…</span
+      >
+    </div>
+
+    <div class="threats" aria-label="Hazards that got real in 2026">
+      {
+        threats.map((t) => (
+          <article class="threat-card">
+            <h3>{t.title}</h3>
+            <p>{t.body}</p>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</header>

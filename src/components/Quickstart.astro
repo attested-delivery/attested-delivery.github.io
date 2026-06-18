@@ -1,0 +1,72 @@
+---
+// (d) Getting started — copy-pasteable commands. Syntax is accurate; values are
+// illustrative (digests/tags shortened). Nothing here is executed by the page.
+---
+
+<section class="section" id="quickstart">
+  <div class="container">
+    <span class="eyebrow">Quickstart</span>
+    <h2>Verify a release in two minutes</h2>
+    <p class="lede">
+      You don't need the org's permissions or its secrets to check its work. Every published release
+      re-verifies from a clean machine. Start by proving an existing one, then adopt the pipeline.
+    </p>
+
+    <div class="quickstart__grid">
+      <div class="quickstart__col">
+        <h3>Verify an existing release</h3>
+        <ol class="olist">
+          <li>Install the GitHub CLI and authenticate (<code>gh auth login</code>).</li>
+          <li>Download a published artifact from a template repo.</li>
+          <li>Verify its SLSA provenance and SBOM — offline-checkable against the digest.</li>
+        </ol>
+        <div class="codeblock">
+          <span class="codeblock__label">terminal</span>
+          <pre><span class="c-comment"># 1 · pull a signed release artifact</span>
+gh release download v0.1.0 \
+  --repo attested-delivery/attested-pipeline-template \
+  --pattern '*-linux-amd64'
+
+<span class="c-comment"># 2 · verify build provenance (SLSA L3)</span>
+gh attestation verify ./app-linux-amd64 \
+  --repo attested-delivery/attested-pipeline-template
+
+<span class="c-comment"># 3 · verify the bill of materials</span>
+gh attestation verify ./app-linux-amd64 \
+  --repo attested-delivery/attested-pipeline-template \
+  --predicate-type https://cyclonedx.org/bom
+
+<span class="c-ok">&check; verification succeeded — digest sha256:2d0586…</span></pre>
+        </div>
+      </div>
+
+      <div class="quickstart__col">
+        <h3>Adopt the pipeline in your repo</h3>
+        <ol class="olist">
+          <li>Start from a template repo (it ships the gates pre-wired).</li>
+          <li>Turn on SHA-pinning enforcement and the required pin-check job.</li>
+          <li>Tag a release; CI signs, attests, and publishes — keyless.</li>
+        </ol>
+        <div class="codeblock">
+          <span class="codeblock__label">terminal</span>
+          <pre><span class="c-comment"># 1 · create your repo from the attested template</span>
+gh repo create my-org/my-service \
+  --template attested-delivery/attested-pipeline-template \
+  --private --clone
+
+<span class="c-comment"># 2 · cut a release — the workflow does the rest</span>
+git tag v0.1.0 &amp;&amp; git push origin v0.1.0
+
+<span class="c-comment"># 3 · CI signs keyless via OIDC + Sigstore, then logs to Rekor</span>
+<span class="c-comment">#    no long-lived keys; identity is the workflow itself</span>
+cosign attest --type cyclonedx --yes \
+  ghcr.io/my-org/my-service@sha256:&hellip;</pre>
+        </div>
+        <p class="muted">
+          Prefer Rust? Start from <code>attested-delivery/rust-template</code> — five-platform build,
+          SBOM, and the same gates.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
