@@ -27,5 +27,13 @@
     "prettier-plugin-astro": "0.14.1",
     "typescript": "6.0.3"
   },
-  "packageManager": "pnpm@9.15.9"
+  "packageManager": "pnpm@9.15.9",
+  "pnpm": {
+    "overrides": {
+      "esbuild@<0.28.1": ">=0.28.1",
+      "js-yaml@<4.2.0": ">=4.2.0",
+      "markdown-it@<14.2.0": ">=14.2.0",
+      "yaml@>=2.0.0 <2.8.3": ">=2.8.3"
+    }
+  }
 }

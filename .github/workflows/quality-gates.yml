@@ -27,17 +27,12 @@ jobs:
     # attested-delivery/.github main @ 698148e (post-#4, 2026-06-19)
     uses: attested-delivery/.github/.github/workflows/pin-check.yml@698148e12da113cfeeef8742c31ae93657959e67
 
-  sast:
-    permissions:
-      security-events: write
-      contents: read
-      actions: read
-      packages: read
-    # attested-delivery/.github main @ 698148e (post-#4, 2026-06-19)
-    uses: attested-delivery/.github/.github/workflows/reusable-sast-codeql.yml@698148e12da113cfeeef8742c31ae93657959e67
-    with:
-      languages: javascript-typescript
-      build-mode: none
+  # SAST: this repo has CodeQL *default setup* enabled (org onboarding standard),
+  # which provides SAST and uploads its own SARIF. An *advanced* CodeQL caller
+  # cannot coexist with default setup ("advanced configurations cannot be
+  # processed when the default setup is enabled"), so SAST is intentionally NOT
+  # wired here — default setup covers it. Repos without default setup wire the
+  # reusable-sast-codeql caller instead (see attested-pipeline-template).
 
   sca:
     permissions:
