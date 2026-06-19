@@ -42,21 +42,26 @@ gh run download "$RUN_ID" --repo attested-delivery/attested-delivery.github.io \
 # 2 · verify SLSA build provenance (bound to the artifact digest)
 gh attestation verify ./_verify/artifact.tar \
   --repo attested-delivery/attested-delivery.github.io \
+  --signer-workflow attested-delivery/attested-delivery.github.io/.github/workflows/deploy.yml \
   --predicate-type https://slsa.dev/provenance/v1
 
 # 3 · verify the CycloneDX SBOM attestation
 gh attestation verify ./_verify/artifact.tar \
   --repo attested-delivery/attested-delivery.github.io \
+  --signer-workflow attested-delivery/attested-delivery.github.io/.github/workflows/deploy.yml \
   --predicate-type https://cyclonedx.org/bom
 ```
 
-Each command exits non-zero on any failure. The provenance and SBOM are signed
-by this repository's deploy workflow (the SLSA L3 build identity), so `--repo`
-is sufficient; inspect the predicate body to read the recorded claim:
+Each command exits non-zero on any failure. `--repo` pins where the build ran;
+`--signer-workflow` pins **which** workflow produced the attestation (the deploy
+workflow), which matters because this repo has more than one provenance-producing
+workflow (`deploy.yml` and `dast.yml`). Inspect the predicate body to read the
+recorded claim:
 
 ```bash
 gh attestation verify ./_verify/artifact.tar \
   --repo attested-delivery/attested-delivery.github.io \
+  --signer-workflow attested-delivery/attested-delivery.github.io/.github/workflows/deploy.yml \
   --predicate-type https://cyclonedx.org/bom --format json \
   | jq '.[0].verificationResult.statement.predicate | keys'
 ```
