@@ -29,10 +29,12 @@ does not deploy.
 ## Verify it yourself
 
 You do not need this repo's permissions or secrets to check its work. From any
-workstation with the [GitHub CLI](https://cli.github.com/) authenticated:
+workstation with the [GitHub CLI](https://cli.github.com/) authenticated
+(`gh` ≥ 2.49, which provides `gh attestation`). The commands below verify the
+**latest** deploy's artifact, which CI retains for 90 days:
 
 ```bash
-# 1 · grab the exact artifact CI published (the Pages tarball)
+# 1 · grab the exact artifact CI published (the Pages tarball, retained 90 days)
 RUN_ID=$(gh run list --repo attested-delivery/attested-delivery.github.io \
   --workflow "Deploy site to GitHub Pages" --status success \
   --limit 1 --json databaseId --jq '.[0].databaseId')
