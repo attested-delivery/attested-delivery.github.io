@@ -1,26 +1,21 @@
 name: quality-gates
 
-# Merge-time quality gates, wired as a thin caller of the org's central reusable
-# workflows in attested-delivery/.github (pinned by full commit SHA).
+# Merge-time quality gates for the marketing site — thin callers of the org's
+# central reusable workflows in attested-delivery/.github (pinned by full commit
+# SHA). Each gate normalizes on SARIF and surfaces in the repository Security
+# tab; wire "Code scanning results" as a required status check to make it a
+# merge gate.
 #
-# Active: pin-check — fails closed on any unpinned `uses:` on push and PR.
-#
-# Pending one org-side allow-list change (owner action):
-#   SAST  (reusable-sast-codeql) and SCA (reusable-sca-osv) both run
-#   `github/codeql-action/*`. Calling them currently startup-fails ("workflow
-#   file issue"), because `github/codeql-action` is not yet permitted by the org
-#   Actions allow-list. Enable it via Org → Settings → Actions → General →
-#   "Allow actions created by GitHub" (or add `github/codeql-action@*`), and also
-#   confirm the OSV subpath `google/osv-scanner-action/*` is covered. Then
-#   uncomment the sast/sca jobs below.
-#
-# Trivy (container/IaC/license) and Scorecard remain out until their actions
-# (aquasecurity/trivy-action, ossf/scorecard-action) are allow-listed too.
+# The deploy pipeline (deploy.yml) additionally signs SLSA provenance + a
+# CycloneDX SBOM over the published Pages artifact and fail-closed verifies them
+# before deploy. Posture (Scorecard) is a repo-level signal and stays here.
 
 on:
   push:
     branches: [main]
   pull_request:
+  schedule:
+    - cron: "37 6 * * 1"
 
 permissions:
   contents: read
@@ -29,23 +24,46 @@ jobs:
   pin-check:
     permissions:
       contents: read
-    uses: attested-delivery/.github/.github/workflows/pin-check.yml@0e8ba553a55146eddf66e027f157b3cbb294466a
+    # attested-delivery/.github main @ 698148e (post-#4, 2026-06-19)
+    uses: attested-delivery/.github/.github/workflows/pin-check.yml@698148e12da113cfeeef8742c31ae93657959e67
 
-  # sast:
-  #   permissions:
-  #     security-events: write
-  #     contents: read
-  #     actions: read
-  #   uses: attested-delivery/.github/.github/workflows/reusable-sast-codeql.yml@0e8ba553a55146eddf66e027f157b3cbb294466a
-  #   with:
-  #     languages: javascript-typescript
-  #
-  # sca:
-  #   permissions:
-  #     actions: read
-  #     contents: read
-  #     security-events: write
-  #     pull-requests: write
-  #   uses: attested-delivery/.github/.github/workflows/reusable-sca-osv.yml@0e8ba553a55146eddf66e027f157b3cbb294466a
-  #   with:
-  #     fail-on-severity: high
+  # SAST: this repo has CodeQL *default setup* enabled (org onboarding standard),
+  # which provides SAST and uploads its own SARIF. An *advanced* CodeQL caller
+  # cannot coexist with default setup ("advanced configurations cannot be
+  # processed when the default setup is enabled"), so SAST is intentionally NOT
+  # wired here — default setup covers it. Repos without default setup wire the
+  # reusable-sast-codeql caller instead (see attested-pipeline-template).
+
+  sca:
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+      pull-requests: write
+    # attested-delivery/.github main @ 698148e (post-#4, 2026-06-19)
+    uses: attested-delivery/.github/.github/workflows/reusable-sca-osv.yml@698148e12da113cfeeef8742c31ae93657959e67
+    with:
+      fail-on-severity: high
+
+  posture:
+    if: github.event_name == 'push' || github.event_name == 'schedule'
+    permissions:
+      security-events: write
+      id-token: write
+      contents: read
+      actions: read
+    # attested-delivery/.github main @ 698148e (post-#4, 2026-06-19)
+    uses: attested-delivery/.github/.github/workflows/reusable-scorecard.yml@698148e12da113cfeeef8742c31ae93657959e67
+    with:
+      publish-results: false
+
+  trivy:
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+      packages: read
+    # attested-delivery/.github main @ 698148e (post-#4, 2026-06-19)
+    uses: attested-delivery/.github/.github/workflows/reusable-trivy.yml@698148e12da113cfeeef8742c31ae93657959e67
+    with:
+      scan-iac: true
