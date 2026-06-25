@@ -35,7 +35,7 @@ jobs:
   pin-check:
     permissions:
       contents: read
-    uses: attested-delivery/.github/.github/workflows/pin-check.yml@0e8ba553a55146eddf66e027f157b3cbb294466a
+    uses: attested-delivery/.github/.github/workflows/pin-check.yml@ca91728c87beb08742325b4ed4d06fcfb261435b
 
   build:
     needs: pin-check
@@ -48,8 +48,8 @@ jobs:
     outputs:
       artifact-digest: ${{ steps.digest.outputs.sha256 }}
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: 24
       # Enable pnpm via Node's built-in corepack rather than the third-party
@@ -60,7 +60,7 @@ jobs:
           corepack prepare pnpm@9.15.9 --activate
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
-      - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
       # Package the Pages artifact inline instead of actions/upload-pages-artifact,
       # whose composite internals call a tag-pinned actions/upload-artifact@v4 —
       # which the org's (correct, foundational) "require SHA-pinned actions" rule
@@ -98,7 +98,7 @@ jobs:
         with:
           subject-path: ${{ runner.temp }}/artifact.tar
           sbom-path: sbom.cdx.json
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: github-pages
           path: ${{ runner.temp }}/artifact.tar
@@ -132,7 +132,7 @@ jobs:
             -H "Accept: application/sarif+json" > results.sarif
           jq -e '.runs' results.sarif > /dev/null
           echo "Fetched CodeQL analysis ${AID}"
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: sast-sarif
           path: results.sarif
@@ -146,7 +146,7 @@ jobs:
       attestations: write
       contents: read
     # attested-delivery/.github main @ 698148e (post-#4, 2026-06-19)
-    uses: attested-delivery/.github/.github/workflows/reusable-attest-scan.yml@698148e12da113cfeeef8742c31ae93657959e67
+    uses: attested-delivery/.github/.github/workflows/reusable-attest-scan.yml@ca91728c87beb08742325b4ed4d06fcfb261435b
     with:
       subject-name: artifact.tar
       subject-digest: sha256:${{ needs.build.outputs.artifact-digest }}
@@ -200,4 +200,4 @@ jobs:
       id-token: write
     steps:
       - id: deployment
-        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
