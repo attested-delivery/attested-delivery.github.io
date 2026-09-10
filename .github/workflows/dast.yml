@@ -34,7 +34,7 @@ jobs:
       subject-name: ${{ steps.pack.outputs.name }}
       subject-digest: ${{ steps.pack.outputs.digest }}
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Pack subject snapshot
         id: pack
         run: |
@@ -45,7 +45,7 @@ jobs:
           DIGEST=$(sha256sum "dist/${FILE}" | cut -d' ' -f1)
           echo "name=${FILE}" >> "$GITHUB_OUTPUT"
           echo "digest=sha256:${DIGEST}" >> "$GITHUB_OUTPUT"
-      - uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4.1.1
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-path: dist/${{ steps.pack.outputs.name }}
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -59,7 +59,7 @@ jobs:
     permissions:
       contents: read
     # attested-delivery/.github main @ 698148e (post-#4, 2026-06-19)
-    uses: attested-delivery/.github/.github/workflows/reusable-zap.yml@ee1f93b566abc109efa0588d3d5308b4dd4a7492
+    uses: attested-delivery/.github/.github/workflows/reusable-zap.yml@78f1933ef020e3d94af848a191297d26e8dc8b4c
     with:
       target: ${{ inputs.target }}
       fail-action: false
@@ -72,7 +72,7 @@ jobs:
       attestations: write
       contents: read
     # attested-delivery/.github main @ 698148e (post-#4, 2026-06-19)
-    uses: attested-delivery/.github/.github/workflows/reusable-attest-scan.yml@ee1f93b566abc109efa0588d3d5308b4dd4a7492
+    uses: attested-delivery/.github/.github/workflows/reusable-attest-scan.yml@78f1933ef020e3d94af848a191297d26e8dc8b4c
     with:
       subject-name: ${{ needs.subject.outputs.subject-name }}
       subject-digest: ${{ needs.subject.outputs.subject-digest }}

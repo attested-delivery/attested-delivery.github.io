@@ -25,7 +25,7 @@ jobs:
     permissions:
       contents: read
     # attested-delivery/.github main @ 698148e (post-#4, 2026-06-19)
-    uses: attested-delivery/.github/.github/workflows/pin-check.yml@ee1f93b566abc109efa0588d3d5308b4dd4a7492
+    uses: attested-delivery/.github/.github/workflows/pin-check.yml@78f1933ef020e3d94af848a191297d26e8dc8b4c
 
   # SAST: this repo has CodeQL *default setup* enabled (org onboarding standard),
   # which provides SAST and uploads its own SARIF. An *advanced* CodeQL caller
@@ -41,7 +41,7 @@ jobs:
       security-events: write
       pull-requests: write
     # attested-delivery/.github main @ 698148e (post-#4, 2026-06-19)
-    uses: attested-delivery/.github/.github/workflows/reusable-sca-osv.yml@ee1f93b566abc109efa0588d3d5308b4dd4a7492
+    uses: attested-delivery/.github/.github/workflows/reusable-sca-osv.yml@78f1933ef020e3d94af848a191297d26e8dc8b4c
     with:
       fail-on-severity: high
 
@@ -53,7 +53,7 @@ jobs:
       contents: read
       actions: read
     # attested-delivery/.github main @ 698148e (post-#4, 2026-06-19)
-    uses: attested-delivery/.github/.github/workflows/reusable-scorecard.yml@ee1f93b566abc109efa0588d3d5308b4dd4a7492
+    uses: attested-delivery/.github/.github/workflows/reusable-scorecard.yml@78f1933ef020e3d94af848a191297d26e8dc8b4c
     with:
       publish-results: false
 
@@ -64,6 +64,6 @@ jobs:
       actions: read
       packages: read
     # attested-delivery/.github main @ 698148e (post-#4, 2026-06-19)
-    uses: attested-delivery/.github/.github/workflows/reusable-trivy.yml@ee1f93b566abc109efa0588d3d5308b4dd4a7492
+    uses: attested-delivery/.github/.github/workflows/reusable-trivy.yml@78f1933ef020e3d94af848a191297d26e8dc8b4c
     with:
       scan-iac: true

@@ -35,7 +35,7 @@ jobs:
   pin-check:
     permissions:
       contents: read
-    uses: attested-delivery/.github/.github/workflows/pin-check.yml@ee1f93b566abc109efa0588d3d5308b4dd4a7492
+    uses: attested-delivery/.github/.github/workflows/pin-check.yml@78f1933ef020e3d94af848a191297d26e8dc8b4c
 
   build:
     needs: pin-check
@@ -48,8 +48,8 @@ jobs:
     outputs:
       artifact-digest: ${{ steps.digest.outputs.sha256 }}
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24
       # Enable pnpm via Node's built-in corepack rather than the third-party
@@ -80,7 +80,7 @@ jobs:
         run: echo "sha256=$(sha256sum "${RUNNER_TEMP}/artifact.tar" | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
       # CycloneDX SBOM of the site's dependencies via Syft (allow-listed SBOM tool).
       - name: Generate CycloneDX SBOM
-        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0.24.0
+        uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26 # v0.24.2
         with:
           path: .
           format: cyclonedx-json
@@ -89,7 +89,7 @@ jobs:
           upload-release-assets: false
       # SLSA build provenance bound to the published artifact's digest (keyless).
       - name: Attest build provenance
-        uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4.1.1
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-path: ${{ runner.temp }}/artifact.tar
       # Attest the CycloneDX SBOM against the same subject digest (keyless).
@@ -146,7 +146,7 @@ jobs:
       attestations: write
       contents: read
     # attested-delivery/.github main @ 698148e (post-#4, 2026-06-19)
-    uses: attested-delivery/.github/.github/workflows/reusable-attest-scan.yml@ee1f93b566abc109efa0588d3d5308b4dd4a7492
+    uses: attested-delivery/.github/.github/workflows/reusable-attest-scan.yml@78f1933ef020e3d94af848a191297d26e8dc8b4c
     with:
       subject-name: artifact.tar
       subject-digest: sha256:${{ needs.build.outputs.artifact-digest }}
@@ -200,4 +200,4 @@ jobs:
       id-token: write
     steps:
       - id: deployment
-        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
